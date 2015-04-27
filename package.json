@@ -1,0 +1,16 @@
+{
+  "name": "bowwow2",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "electron-prebuilt": "^0.25.1",
+    "react": "^0.13.2"
+  }
+}
