@@ -5,6 +5,8 @@
   </head>
   <body>
     <h1>Bowwow</h1>
+    <div id="container">
+    </div>
     <div id="app">
       <section>
         <h2>system</h2>
@@ -32,151 +34,7 @@
     </div>
   </body>
   <script>
-  var Vue = require("vue")
-  var resemble = require("resemblejs").resemble
-  var uintAverage = require("./uintAverage")
-  var normalizeValue = require("./lib/normalize-value")
-  var os = require("os")
-  //var usage = require("usage")
-    // global
-  var audioContext = new webkitAudioContext()
-  var javascriptNode = audioContext.createScriptProcessor(2048, 1, 1)
-  Vue.component("graph", require("./vue-graph")())
-  var vm = new Vue({
-    data : {
-      times: [],
-      freq: [],
-      videoDiffStack: [],
-      videoDiffImage: null, 
-      memoryUsage: null,
-      cpuUsage : null
-    },
-    methods: {
-      toPoints : function(byteArray){
-        var pts = []
-        var length =  byteArray.length
-        var sampling = 10        
-        for(var i=0; i < length; i+=sampling){
-          var pt = normalizeValue(i, byteArray[i], length ,255)
-          pts.push(pt)
-        }
-        return pts 
-      },
-      onUserMediaSuccess: function(stream){
-        var self = this
-        // audio
-        this.handleAudioProgress(stream, function(freq, times){
-          self.$data.freq = freq
-          self.$data.times = times
-        })
-        // video
-        var video = this.$$.video
-        video.src = window.URL.createObjectURL(stream)
-        video.volume = 0
-        video.play()  
-      },
-      handleAudioProgress: function(stream, onAudioProgress){
-        var microphone = audioContext.createMediaStreamSource(stream)
-        var analyser = audioContext.createAnalyser()
-        analyser.smoothingTimeConstant = 0.3
-        analyser.fftSize = 1024
-        microphone.connect(analyser)
-        analyser.connect(javascriptNode)
-        javascriptNode.connect(audioContext.destination)
-        
-        var self = this
-        javascriptNode.onaudioprocess = function(e) {
-          var freq =  new Uint8Array(analyser.frequencyBinCount)
-          var times = new Uint8Array(analyser.fftSize)
-          analyser.getByteFrequencyData(freq)
-          analyser.getByteTimeDomainData(times)
-          onAudioProgress(freq, times)
-        }
-      },
-      captureCurrentVideo : function(){
-        var type = "image/png"
-        var dataUrl = this.$$.videoCanvas.toDataURL(type)
-        return dataUrl
-      },
-      fitCanvasSize : function(){
-        var video = this.$$.video
-        var videoAspect = video.clientHeight / video.clientWidth 
-        var ctxWidth = 320
-        var ctxHeight = ctxWidth * videoAspect
-        var canvas = this.$$.videoCanvas
-        canvas.width = ctxWidth
-        canvas.height = ctxHeight
-      },
-      renderVideoCanvas : function(){
-        var video = this.$$.video
-        var canvas = this.$$.videoCanvas
-        canvas.getContext("2d").drawImage(
-          video,
-          0, 0, video.clientWidth, video.clientHeight, 
-          0, 0, canvas.width , canvas.height)
-      },
-      capture : function(){
-        var oldData = this.captureCurrentVideo()
-        this.renderVideoCanvas()
-        var newData = this.captureCurrentVideo()
-        var diff = resemble(oldData).compareTo(newData)
-        var self = this
-        diff.ignoreColors().onComplete(function(data){
-          self.$data.videoDiffImage = data.getImageDataUrl()
-          if(typeof m === "number"){
-            m = [i / self.$data.width, m]
-          }
-          self.pushDiffPoint(Number(data.misMatchPercentage))
-        })
-      },
-      pushDiffPoint : function(newValue){
-        if(this.$data.videoDiffStack.length > 100){
-          this.$data.videoDiffStack.shift()
-        }
-        this.$data.videoDiffStack.push(newValue)        
-        this.videoDiffPoints
-      },
-      calcSystemValue : function(){
-        // memory
-        var free = os.freemem() / 1024 / 1024
-        var total = os.totalmem() / 1024 / 1024
-        this.$data.memoryUsage = free + " / " + total + " ("+(free/total*100)+"%)"
-        // cpus
-        var pid = process.pid // you can use any valid PID instead
-        var self = this
-        /*usage.lookup(pid, function(err, result) {
-          self.$data.cpuUsage = result.cpu
-        });*/
-      }
-      
-    },
-    computed : {
-      freqPoints : function(){
-        return this.toPoints(this.freq)
-      },
-      timesPoints : function(){
-        return this.toPoints(this.times)
-      },
-      videoDiffPoints : function(){
-        var len = this.$data.videoDiffStack.length
-        var pts = this.$data.videoDiffStack.map(function(data, i){
-          return [i/len, data/100]
-        })
-        return pts
-      },
-    },
-    created : function(){
-      var self = this
-      navigator.webkitGetUserMedia({ video: true, audio: true}, this.onUserMediaSuccess, function(e){
-        console.log(e)
-      })
-    }
-  })
-  vm.$mount("#app")
-  // TODO:調整可能にする
-  setInterval(function(){
-    vm.capture()
-    vm.calcSystemValue()
-  }, 500)
+  require('babel').register()
+  require("./reader.js")
   </script>
 </html>

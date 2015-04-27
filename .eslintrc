@@ -1,0 +1,26 @@
+rules:
+  quotes: 0
+ecmaFeatures:
+  arrowFunctions: true
+  blockBindings: true
+  destructuring: true
+  regexUFlag: true
+  regexYFlag: true
+  templateStrings: true
+  binaryLiterals: true
+  octalLiterals: true
+  unicodeCodePointEscapes: true
+  defaultParams: true
+  restParams: true
+  forOf: true
+  objectLiteralComputedProperties: true
+  objectLiteralShorthandMethods: true
+  objectLiteralShorthandProperties: true
+  objectLiteralDuplicateProperties: true
+  generators: true
+  spread: true
+  superInFunctions: true
+  classes: true
+  modules: true
+  jsx: true
+  globalReturn: true
