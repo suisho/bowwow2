@@ -1,6 +1,6 @@
 import React from 'react'
-import Foo from './Foo.jsx'
+import App from './view/App.jsx'
 
 var container = document.querySelector("#container")
 
-React.render(<Foo />, container)
+React.render(<App />, container)

@@ -9,9 +9,9 @@
     </div>
   </body>
   <script>
-  require('coffee-script').register()
-  require('./babel.coffee').register()
-  // require('babel').register()
-  require("./main.jsx")
+  window.onload = function(){
+    require('babel/register')()
+    require("./main.jsx")
+  }
   </script>
 </html>
