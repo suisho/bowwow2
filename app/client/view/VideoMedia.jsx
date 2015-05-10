@@ -69,7 +69,7 @@ class VideoCanvas extends React.Component{
     this.diffImage()
   }
   captureImage(){
-    return this.node().toDataURL("image/png")
+    return this.node().toDataURL("image/jpeg")
   }
   isValidImage(image){
     // TODO: this is very adhoc
@@ -116,6 +116,13 @@ export default class VideoMedia extends React.Component{
       video: null,
       videoTimeDiff: 0,
     }
+    this.setTimer()
+  }
+  setTimer(){
+    setInterval(() => {
+      if(!this.imageDiff) return
+      console.log(this.imageDiff.length)
+    }, 500)
   }
   onVideoChange(e){
     // console.log(e.timeStamp)
@@ -128,7 +135,7 @@ export default class VideoMedia extends React.Component{
   }
   onImageDiff(data){
     this.imageDiff = data.getImageDataUrl()
-    console.log(data.misMatchPercentage)
+    // console.log(data.misMatchPercentage)
   }
   imageDiffElm(diff){
     return diff ? <img src={diff} /> : null
