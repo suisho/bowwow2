@@ -1,5 +1,11 @@
+env:
+  browser: true
+  node: true
+  builtin: true
 rules:
   quotes: 0
+  semi: 0
+  new-cap: 0
 ecmaFeatures:
   arrowFunctions: true
   blockBindings: true
