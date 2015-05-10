@@ -7,34 +7,11 @@
     <h1>Bowwow</h1>
     <div id="container">
     </div>
-    <div id="app">
-      <section>
-        <h2>system</h2>
-        <h3>memory</h3>
-        <div v-text="memoryUsage"></div>
-        <h3>cpu</h3>
-        <div v-text="cpuUsage"></div>
-      </section>
-      <section>
-        <h2>voice</h2>
-        <div v-with="points: freqPoints" v-component="graph"></div>
-        <div v-with="points: timesPoints" v-component="graph"></div>
-      </section>
-      <section>
-        <h2>video</h2>
-        <div v-with="points: videoDiffPoints" v-component="graph"></div>
-        
-        <button v-on="click: capture">capture</button>
-        <img v-attr="src: videoDiffImage">
-        <video v-el="video" v-on="loadeddata:fitCanvasSize"></video>
-        <canvas v-el="videoCanvas" style="display:none"></canvas>
-        </div>        
-      </section>
-    
-    </div>
   </body>
   <script>
-  require('babel').register()
-  require("./reader.js")
+  require('coffee-script').register()
+  require('./babel.coffee').register()
+  // require('babel').register()
+  require("./main.jsx")
   </script>
 </html>
