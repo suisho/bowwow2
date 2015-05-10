@@ -6,7 +6,13 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "electron ./app"
+    "start": "electron ./app",
+    "start-viewer": "budo viewer/index.jsx -v -d --live | garnish"
+  },
+  "browserify": {
+    "transform": [
+      "babelify"
+    ]
   },
   "keywords": [],
   "author": "",

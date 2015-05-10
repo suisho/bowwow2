@@ -1,7 +1,9 @@
 import React from 'react'
-
+import Storage from '../../../lib/Storage'
 import {resemble} from 'resemblejs'
-  
+
+let storage = new Storage()
+
 class VideoLoader extends React.Component{
   node(){
     return this.refs.video.getDOMNode()
@@ -31,7 +33,7 @@ class VideoLoader extends React.Component{
     console.error(err)
   }
   render(){
-    return <video ref="video" style={{opacity: 0}} />
+    return <video ref="video" style={{opacity: this.props.debug ? 1 : 0}} />
   }
 }
 
@@ -39,8 +41,8 @@ class VideoCanvas extends React.Component{
   constructor(){
     super()
     this.state = {
-      width : 320,
-      height: 320 * 2/3
+      width : 0,
+      height: 0
     }
   }
   node(){
@@ -64,6 +66,32 @@ class VideoCanvas extends React.Component{
       0, 0, video.clientWidth, video.clientHeight,
       0, 0, width, height
     )
+    this.diffImage()
+  }
+  captureImage(){
+    return this.node().toDataURL("image/png")
+  }
+  isValidImage(image){
+    // TODO: this is very adhoc
+    if(!image) return false
+    if(image === "data:,") return false
+    return true
+  }
+  diffImage(){
+    let capture = this.captureImage()
+    if(this.isValidImage(capture) === false){
+      return
+    }
+    if(this.lastCapture === undefined){
+      this.lastCapture = capture
+    }
+    let diff = resemble(this.lastCapture).compareTo(capture)
+            .ignoreColors()
+    diff.onComplete((data) => {
+      this.props.onImageDiff(data)
+    })
+
+    this.lastCapture = capture
   }
   getCanvasSize(video){
     let videoAspect = video.clientHeight / video.clientWidth
@@ -73,6 +101,7 @@ class VideoCanvas extends React.Component{
   }
   render(){
     return <canvas ref="canvas"
+      style={{opacity: this.props.debug ? 1 : 0}}
       width={this.state.width}
       height={this.state.height}/>
   }
@@ -82,9 +111,10 @@ export default class VideoMedia extends React.Component{
   constructor(e){
     super()
     this.lastTimeStamp = new Date().getTime()
+    this.imageDiff = null
     this.state = {
       video: null,
-      videoTimeDiff: 0
+      videoTimeDiff: 0,
     }
   }
   onVideoChange(e){
@@ -93,14 +123,29 @@ export default class VideoMedia extends React.Component{
       video: e.target,
       videoTimeDiff: e.timeStamp - this.lastTimeStamp
     })
+    // storage.setVideoTimestamp(e.timeStamp)
     this.lastTimeStamp = e.timeStamp
   }
+  onImageDiff(data){
+    this.imageDiff = data.getImageDataUrl()
+    console.log(data.misMatchPercentage)
+  }
+  imageDiffElm(diff){
+    return diff ? <img src={diff} /> : null
+  }
   render(){
+    let imgElm = this.imageDiffElm(this.imageDiff)
+    let debug=0
     return (
       <div>
         <div>{this.state.videoTimeDiff}</div>
-        <VideoCanvas video={this.state.video} />
-        <VideoLoader onTimeUpdated={this.onVideoChange.bind(this)} />
+        {imgElm}
+        <VideoCanvas
+          video={this.state.video}
+          onImageDiff={this.onImageDiff.bind(this)}
+          debug={debug}
+        />
+      <VideoLoader debug={debug} onTimeUpdated={this.onVideoChange.bind(this)} />
       </div>
     )
   }
